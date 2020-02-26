@@ -19,10 +19,33 @@ const authenticate = async () => {
   }
 };
 
+const checkCookie = async () => {
+  try {
+    const res = await axios.get('/read_cookie')
+    console.log(res.data)
+    if (res.data.screen === 'auth') {
+      console.log('need to auth first!')
+    }
+  } catch(e) {
+    console.log(e)
+  }
+}
+
+const clearCookie = async () => {
+  try {
+    const res = await axios.get('/clear_cookie');
+    if (res.status === 200) {
+      console.log('Successfully cleared cookie')
+    }
+  } catch(e) {
+    console.log(e);
+  }
+}
+
 function App() {
-  // useEffect(() => {
-  //   authenticate()
-  // });
+  useEffect(() => {
+    clearCookie()
+  });
   return (
     <Router>
       <div className="App">
@@ -30,8 +53,9 @@ function App() {
           <Link to="/dash">Dash</Link>
           <Link to="/pics">Pics</Link>
         </nav>
+        <button onClick={authenticate}>Authorize</button>
+        <button onClick={checkCookie}>Check cookie</button>
         <Switch>
-          <button onClick={authenticate}>Click me</button>
           <Route path="/dash">
             <p>You're at dash</p>
           </Route>

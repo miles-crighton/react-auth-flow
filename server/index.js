@@ -3,6 +3,7 @@ const path = require('path');
 const app = express();
 
 const basicAuth = require('express-basic-auth');
+const cookieParser = require('cookie-parser');
 
 const auth = basicAuth({
     users: {
@@ -17,6 +18,8 @@ const PORT = 5000 || process.env.PORT;
 // app.use(express.urlencoded({ extended: false }));
 // app.use(require("body-parser").json());
 
+app.use(cookieParser('82e4e438a0705fabf61f9854e3b575af'));
+
 app.use(
     express.static(path.join(__dirname, '../client/build'))
 ).listen(
@@ -24,11 +27,30 @@ app.use(
 );
 
 app.get('/authenticate', auth, (req, res) => {
-    if (req.auth.user === 'admin') {
-        res.send('admin');
-    } else if (req.auth.user === 'user') {
-        res.send('user');
+    const options = {
+        httpOnly: true,
+        signed: true
     }
+
+    if (req.auth.user === 'admin') {
+        res.cookie('name', 'admin', options).send({ screen: 'admin' });
+    } else if (req.auth.user === 'user') {
+        res.cookie('name', 'user', options).send({ screen: 'user' });
+    }
+});
+
+app.get('/read_cookie', (req, res) => {
+    if (req.signedCookies.name === 'admin') {
+        res.send({ screen: 'admin' });
+    } else if (req.signedCookies.name === 'user') {
+        res.send({ screen: 'user' });
+    } else {
+        res.send({ screen: 'auth' });
+    }
+});
+
+app.get('/clear_cookie', (req, res) => {
+    res.clearCookie('name').end();
 });
 
 app.get('/', (req, res) => {
