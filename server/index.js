@@ -13,9 +13,9 @@ const auth = basicAuth({
 
 const PORT = 5000 || process.env.PORT;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
-app.use(require("body-parser").json());
+// app.use(express.json());
+// app.use(express.urlencoded({ extended: false }));
+// app.use(require("body-parser").json());
 
 app.use(
     express.static(path.join(__dirname, '../client/build'))
@@ -23,11 +23,10 @@ app.use(
     PORT, () => console.log(`Listening on ${PORT}`)
 );
 
-app.post('/authenticate', (req, res) => {
-    console.log(req.body)
-    if (req.body.auth.user === 'admin') {
+app.get('/authenticate', auth, (req, res) => {
+    if (req.auth.user === 'admin') {
         res.send('admin');
-    } else if (req.body.auth.user === 'user') {
+    } else if (req.auth.user === 'user') {
         res.send('user');
     }
 });
