@@ -5,18 +5,18 @@ const app = express();
 const basicAuth = require('express-basic-auth');
 const cookieParser = require('cookie-parser');
 
-const auth = basicAuth({
-    users: {
-        admin: '123',
-        user: '456',
-    },
-});
+
+let users = {
+    admin: '123',
+    user: '456',
+};
+
 
 const PORT = 5000 || process.env.PORT;
 
-// app.use(express.json());
-// app.use(express.urlencoded({ extended: false }));
-// app.use(require("body-parser").json());
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
+app.use(require("body-parser").json());
 
 app.use(cookieParser('82e4e438a0705fabf61f9854e3b575af'));
 
@@ -26,16 +26,17 @@ app.use(
     PORT, () => console.log(`Listening on ${PORT}`)
 );
 
-app.get('/authenticate', auth, (req, res) => {
+app.get('/authenticate', basicAuth({ users }), (req, res) => {
     const options = {
         httpOnly: true,
         signed: true
     }
+    console.log(users)
 
     if (req.auth.user === 'admin') {
         res.cookie('name', 'admin', options).send({ screen: 'admin' });
-    } else if (req.auth.user === 'user') {
-        res.cookie('name', 'user', options).send({ screen: 'user' });
+    } else{
+        res.cookie('name', req.auth.user, options).send({ screen: req.auth.user });
     }
 });
 
@@ -54,9 +55,21 @@ app.get('/clear_cookie', (req, res) => {
 });
 
 app.get('/get_user_data', (req, res) => {
-    if (req.signedCookies.name === 'admin' || req.signedCookies.name === 'user') {
+    if (req.signedCookies.name) {
         res.send({ user: req.signedCookies.name, data: [1, 2, 3] })
     }
+});
+
+app.post('/create_account', (req, res) => {
+    const options = {
+        httpOnly: true,
+        signed: true
+    }
+
+    users[req.body.username] = req.body.password
+    res.cookie('name', req.body.username, options).send({ screen: req.body.username })
+    console.log(`Added ${req.body.username} to users`)
+    console.log(users)
 });
 
 app.get('/', (req, res) => {

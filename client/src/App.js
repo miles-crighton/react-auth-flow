@@ -21,6 +21,7 @@ import {
   Link,
   useHistory,
 } from 'react-router-dom'
+import CreateAccountView from './components/CreateAccountView';
 
 const auth = {
   isAuthenticated: false,
@@ -38,6 +39,22 @@ const auth = {
     } catch (e) {
       console.log(e);
       return 'Error logging in'
+    }
+  },
+  createAccount: async (username, password, cb) => {
+    try {
+      const res = await axios.post('/create_account', { username, password });
+      console.log(res.data);
+      if (res.status === 200) {
+        auth.isAuthenticated = true
+        cb(); //Change react router history
+        return ''
+      } else {
+        return 'Error'
+      }
+    } catch (e) {
+      console.log(e);
+      return 'Error creating account'
     }
   },
   checkCookie: async () => {
@@ -84,6 +101,9 @@ function App() {
     await auth.clearCookie(cb);
     setLoginStatus('');
   }
+  const createAccount = async (username, password, cb) => {
+    const status = await auth.createAccount(username, password, cb);
+  }
 
   return (
     <Router>
@@ -104,6 +124,12 @@ function App() {
             <LoginView
               status={loginStatus}
               submitLogin={submitLogin}
+            />
+          </Route>
+          <Route path="/create-account">
+            <CreateAccountView
+              status={false}
+              createAccount={createAccount}
             />
           </Route>
           <PrivateRoute path="/dashboard">

@@ -12,19 +12,6 @@ import {
 } from "react-router-dom";
 
 const useStyles = makeStyles(theme => ({
-    paper: {
-        marginTop: theme.spacing(8),
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-    },
-    avatar: {
-        margin: theme.spacing(1),
-        backgroundColor: theme.palette.secondary.main,
-    },
-    floatingLabelFocusStyle: {
-        
-    },
     form: {
         width: '100%', // Fix IE 11 issue.
         marginTop: theme.spacing(1),
@@ -41,30 +28,27 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
-const LoginView = (props) => {
+const CreateAccountView = (props) => {
     const classes = useStyles();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
     let history = useHistory();
     let location = useLocation();
-    let { from } = location.state || { from: { pathname: "/" } };
+    let { from } = location.state || { from: { pathname: "/dashboard" } };
 
     const handleLogin = (e) => {
         e.preventDefault()
-        console.log('Logging in...')
-        props.submitLogin(username, password, () => {
-            history.replace(from);
+        console.log('Creating account...')
+        props.createAccount(username, password, () => {
+            history.push('/dashboard');
         });
-    }
-    const redirectNewAccount = () => {
-        history.push('/create-account');
     }
 
     return (
         <Container component="main" maxWidth="xs" className={classes.container}>
             <Typography component="h1" variant="h5">
-                Login
+                Create Account
             </Typography>
             {props.status ? <p>❌ {props.status}</p> : null}
             <form onSubmit={handleLogin} className={classes.form}>
@@ -99,7 +83,7 @@ const LoginView = (props) => {
                             className: classes.floatingLabelFocusStyle,
                         }}
                     />
-                    <Button 
+                    <Button
                         type="submit"
                         variant="contained"
                         color="primary"
@@ -108,10 +92,9 @@ const LoginView = (props) => {
                         Submit
                     </Button>
                 </FormGroup>
-                <Button onClick={redirectNewAccount} variant="contained" color="primary" fullWidth>Create new account</Button>
             </form>
             {/* <Button onClick={handleLogin} variant="contained" color="primary">Create Account</Button> */}
         </Container>
     )
 }
-export default LoginView
+export default CreateAccountView
