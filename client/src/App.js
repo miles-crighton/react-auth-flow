@@ -96,6 +96,9 @@ function App() {
           </AppBar>
         </nav>
         <Switch>
+          <Route exact path="/">
+            <HomeView />
+          </Route>
           <Route path="/login">
             <LoginView
               status={loginStatus}
@@ -105,9 +108,6 @@ function App() {
           <PrivateRoute path="/dashboard">
             <DashView logout={handleLogout} /> 
           </PrivateRoute>
-          <Route exact path="/">
-            <HomeView /> 
-          </Route>
           <Route path="*">
             <p>404</p>
           </Route>
