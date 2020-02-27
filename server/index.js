@@ -41,10 +41,8 @@ app.get('/authenticate', basicAuth({ users }), (req, res) => {
 });
 
 app.get('/read_cookie', (req, res) => {
-    if (req.signedCookies.name === 'admin') {
-        res.send({ screen: 'admin' });
-    } else if (req.signedCookies.name === 'user') {
-        res.send({ screen: 'user' });
+    if (req.signedCookies.name) {
+        res.send({ screen: req.signedCookies.name });
     } else {
         res.send({ screen: 'auth' });
     }
