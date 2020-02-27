@@ -53,6 +53,12 @@ app.get('/clear_cookie', (req, res) => {
     res.clearCookie('name').end();
 });
 
+app.get('/get_user_data', (req, res) => {
+    if (req.signedCookies.name === 'admin' || req.signedCookies.name === 'user') {
+        res.send({ user: req.signedCookies.name, data: [1, 2, 3] })
+    }
+});
+
 app.get('/', (req, res) => {
     //res.sendFile(path.join(__dirname, '../client/build/index.html'));
 });

@@ -1,4 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import { makeStyles } from '@material-ui/core/styles';
+import axios from 'axios';
 
 import {
     Container,
@@ -9,11 +11,49 @@ import {
     useHistory,
 } from 'react-router-dom'
 
+const useStyles = makeStyles(theme => ({
+    container: {
+        backgroundColor: 'white',
+        position: 'relative',
+        top: '100px',
+        padding: '20px',
+        borderRadius: '10px'
+    },
+    logout: {
+
+    }
+}));
+
+
+
 const DashView = (props) => {
+    const [userData, setUserData] = useState([]);
+    const [user, setUser] = useState('');
+    const classes = useStyles();
+
+    useEffect(() => {
+        const getData = async () => {
+            try {
+                const res = await axios.get('/get_user_data');
+                console.log(res)
+                if (res.status === 200) {
+                    setUserData(res.data.data)
+                    setUser(res.data.user)
+                }
+            } catch (e) {
+                console.log(e);
+            }
+        }
+        getData()
+    }, []);
+
     return (
-        <Container>
-            <h1>Welcome to your dashboard!</h1>
-            <LogoutButton logout={props.logout} />
+        <Container className={classes.container} maxWidth='sm' component="main">
+            <h1>Welcome to your dashboard {user}!</h1>
+            {userData.map((val) => {
+                return <div key={val}>{val}</div>
+            })}
+            <LogoutButton logout={props.logout} className={classes.logout}/>
         </Container>
     )
 }
@@ -27,6 +67,6 @@ const LogoutButton = (props) => {
     }
 
     return (
-        <Button onClick={handleLogout}>Logout</Button>
+        <Button onClick={handleLogout} color="primary" variant="contained" className={props.className}>Logout</Button>
     )
 }

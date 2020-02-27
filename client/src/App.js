@@ -37,7 +37,6 @@ const auth = {
       }
     } catch (e) {
       console.log(e);
-      if (e.status)
       return 'Error logging in'
     }
   },
@@ -49,7 +48,9 @@ const auth = {
         console.log('need to auth first!')
       } else {
         auth.isAuthenticated = true
+        return true
       }
+      return false
     } catch (e) {
       console.log(e)
     }
