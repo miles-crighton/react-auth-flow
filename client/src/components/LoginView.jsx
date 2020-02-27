@@ -34,12 +34,14 @@ const useStyles = makeStyles(theme => ({
     },
     container: {
         backgroundColor: 'white',
+        position: 'relative',
+        top: '100px',
         padding: '20px',
         borderRadius: '10px'
     }
 }));
 
-const InputView = (props) => {
+const LoginView = (props) => {
     const classes = useStyles();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
@@ -55,13 +57,14 @@ const InputView = (props) => {
             history.replace(from);
         });
     }
+    console.log(props.status)
 
     return (
         <Container component="main" maxWidth="xs" className={classes.container}>
             <Typography component="h1" variant="h5">
                 Login
             </Typography>
-            {props.status ? <p>Error logging in</p> : null}
+            {props.status ? <p>{props.status}</p> : null}
             <form onSubmit={handleLogin} className={classes.form}>
                 <FormGroup>
                     <TextField
@@ -108,4 +111,4 @@ const InputView = (props) => {
         </Container>
     )
 }
-export default InputView
+export default LoginView

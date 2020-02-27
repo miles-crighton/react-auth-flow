@@ -3,9 +3,14 @@ import logo from './logo.svg';
 import axios from 'axios';
 import './App.css';
 
-import Button from '@material-ui/core/Button'
+import Button from '@material-ui/core/Button';
+import AppBar from '@material-ui/core/Appbar';
+import Toolbar from '@material-ui/core/Toolbar';
 
-import LoginView from './components/LoginView'
+import LinkButton from './components/LinkButton'
+
+import LoginView from './components/LoginView';
+import DashView from './components/DashView';
 
 import {
   BrowserRouter as Router,
@@ -24,13 +29,15 @@ const auth = {
       console.log(res.data);
       if (res.status === 200) {
         auth.isAuthenticated = true
+        cb(); //Change react router history
+        return ''
+      } else {
+        return 'Incorrect login, please try again.'
       }
-      //Need to change react-router history
-      cb();
-      return true
     } catch (e) {
       console.log(e);
-      return false
+      if (e.status)
+      return 'Error logging in'
     }
   },
   checkCookie: async () => {
@@ -61,27 +68,31 @@ const auth = {
 };
 
 function App() {
-  const [loginStatus, setLoginStatus] = useState(false);
+  const [loginStatus, setLoginStatus] = useState('');
 
   useEffect(() => {
     auth.clearCookie()
   }, []);
 
-  const submitLogin = (username, password, cb) => {
-    const status = auth.authenticate(username, password, cb);
+  const submitLogin = async (username, password, cb) => {
+    const status = await auth.authenticate(username, password, cb);
     setLoginStatus(status);
   }
-  const handleLogout = (cb) => {
-    auth.clearCookie(cb);
-    setLoginStatus(false);
+  const handleLogout = async (cb) => {
+    await auth.clearCookie(cb);
+    setLoginStatus('');
   }
 
   return (
     <Router>
       <div className="App">
         <nav className="App-nav">
-          <Link to="/dash">Dash</Link>
-          <Link to="/pics">Pics</Link>
+          <AppBar position="static" color="primary2">
+            <Toolbar>
+              <LinkButton to="/">Home</LinkButton>
+              <LinkButton to="/dashboard">Dashboard</LinkButton>
+            </Toolbar>
+          </AppBar>
         </nav>
         <Switch>
           <Route path="/login">
@@ -90,12 +101,14 @@ function App() {
               submitLogin={submitLogin}
             />
           </Route>
-          <PrivateRoute path="/">
-            <h1>Welcome!</h1>
-            <LogoutButton
-              logout={handleLogout}
-            />
+          <PrivateRoute path="/dashboard">
+            <DashView logout={handleLogout} /> 
           </PrivateRoute>
+          <Route exact path="/">
+            <p>Welcome to the home page!</p>
+            <p>Here's a cat for your troubles:</p>
+            <img src='https://cdn.pixabay.com/photo/2017/11/09/21/41/cat-2934720_960_720.jpg' alt='Sitting Cat' style={{height: 300}}></img>
+          </Route>
           <Route path="*">
             <p>404</p>
           </Route>
@@ -124,17 +137,4 @@ function PrivateRoute({ children, ...rest }) {
       }
     />
   );
-}
-
-
-const LogoutButton = (props) => {
-  let history = useHistory()
-
-  const handleLogout = () => {
-    props.logout(() => { history.push("/") })
-  }
-
-  return (
-    <Button onClick={handleLogout}>Logout</Button>
-  )
 }
