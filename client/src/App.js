@@ -5,8 +5,6 @@ import './App.css';
 
 import LoginView from './components/LoginView'
 
-
-
 import {
   BrowserRouter as Router,
   Switch,
@@ -15,50 +13,61 @@ import {
   Link
 } from 'react-router-dom'
 
-const authenticate = async (username, password) => {
-  try {
-    const res = await axios.get('/authenticate', { auth: { username, password } });
-    console.log(res.data);
-    return true
-  } catch(e) {
-    console.log(e);
-    return false
+
+
+
+
+const auth = {
+  isAuthenticated: false,
+  authenticate: async (username, password, cb) => {
+    try {
+      const res = await axios.get('/authenticate', { auth: { username, password } });
+      console.log(res.data);
+      if (res.status === 200) {
+        auth.isAuthenticated = true
+      }
+      //Need to change react-router history
+      cb();
+      return true
+    } catch (e) {
+      console.log(e);
+      return false
+    }
+  },
+  checkCookie: async () => {
+    try {
+      const res = await axios.get('/read_cookie')
+      console.log(res.data)
+      if (res.data.screen === 'auth') {
+        console.log('need to auth first!')
+      } else {
+        auth.isAuthenticated = true
+      }
+    } catch (e) {
+      console.log(e)
+    }
+  },
+  clearCookie: async () => {
+    try {
+      const res = await axios.get('/clear_cookie');
+      if (res.status === 200) {
+        console.log('Successfully cleared cookie')
+      }
+    } catch (e) {
+      console.log(e);
+    }
   }
 };
 
-const checkCookie = async () => {
-  try {
-    const res = await axios.get('/read_cookie')
-    console.log(res.data)
-    if (res.data.screen === 'auth') {
-      console.log('need to auth first!')
-    }
-  } catch(e) {
-    console.log(e)
-  }
-}
-
-const clearCookie = async () => {
-  try {
-    const res = await axios.get('/clear_cookie');
-    if (res.status === 200) {
-      console.log('Successfully cleared cookie')
-    }
-  } catch(e) {
-    console.log(e);
-  }
-}
-
 function App() {
-  const [loggedIn, setLoggedIn] = useState(false);
   const [loginStatus, setLoginStatus] = useState(false);
 
   useEffect(() => {
-    clearCookie()
+    auth.clearCookie()
   }, []);
 
-  const submitLogin = (username, password) => {
-    const status = authenticate(username, password);
+  const submitLogin = (username, password, cb) => {
+    const status = auth.authenticate(username, password, cb);
     setLoginStatus(status);
   }
 
@@ -69,7 +78,6 @@ function App() {
           <Link to="/dash">Dash</Link>
           <Link to="/pics">Pics</Link>
         </nav>
-
         <Switch>
           <Route path="/login">
             <LoginView
@@ -77,12 +85,9 @@ function App() {
               submitLogin={submitLogin}
             />
           </Route>
-          <Route path="/pics">
-            <p>You're at pics!</p>
-          </Route>
-          <Route path="/">
-            <Redirect exact from="/" to="login" />
-          </Route>
+          <PrivateRoute path="/">
+            <h1>Welcome!</h1>
+          </PrivateRoute>
           <Route path="*">
             <p>404</p>
           </Route>
@@ -93,3 +98,23 @@ function App() {
 }
 
 export default App;
+
+function PrivateRoute({ children, ...rest }) {
+  return (
+    <Route
+      {...rest}
+      render={({ location }) =>
+        auth.isAuthenticated ? (
+          children
+        ) : (
+            <Redirect
+              to={{
+                pathname: "/login",
+                state: { from: location }
+              }}
+            />
+          )
+      }
+    />
+  );
+}

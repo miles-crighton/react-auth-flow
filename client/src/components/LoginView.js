@@ -6,6 +6,11 @@ import Container from '@material-ui/core/Container';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
+import {
+    useHistory,
+    useLocation
+} from "react-router-dom";
+
 const useStyles = makeStyles(theme => ({
     paper: {
         marginTop: theme.spacing(8),
@@ -39,10 +44,17 @@ const InputView = (props) => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
 
+    let history = useHistory();
+    let location = useLocation();
+
+    let { from } = location.state || { from: { pathname: "/" } };
+
     const handleLogin = (e) => {
         e.preventDefault()
         console.log('Logging in...')
-        props.submitLogin(username, password)
+        props.submitLogin(username, password, () => {
+            history.replace(from);
+        });
     }
     return (
         <Container component="main" maxWidth="xs" className={classes.container}>
