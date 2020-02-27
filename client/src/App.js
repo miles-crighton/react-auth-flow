@@ -1,21 +1,28 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import logo from './logo.svg';
 import axios from 'axios';
 import './App.css';
+
+import LoginView from './components/LoginView'
+
+
 
 import {
   BrowserRouter as Router,
   Switch,
   Route,
+  Redirect,
   Link
 } from 'react-router-dom'
 
-const authenticate = async () => {
+const authenticate = async (username, password) => {
   try {
-    const res = await axios.get('/authenticate', { auth: { username: 'admin', password: '123' } });
+    const res = await axios.get('/authenticate', { auth: { username, password } });
     console.log(res.data);
+    return true
   } catch(e) {
     console.log(e);
+    return false
   }
 };
 
@@ -43,9 +50,18 @@ const clearCookie = async () => {
 }
 
 function App() {
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [loginStatus, setLoginStatus] = useState(false);
+
   useEffect(() => {
     clearCookie()
-  });
+  }, []);
+
+  const submitLogin = (username, password) => {
+    const status = authenticate(username, password);
+    setLoginStatus(status);
+  }
+
   return (
     <Router>
       <div className="App">
@@ -53,14 +69,19 @@ function App() {
           <Link to="/dash">Dash</Link>
           <Link to="/pics">Pics</Link>
         </nav>
-        <button onClick={authenticate}>Authorize</button>
-        <button onClick={checkCookie}>Check cookie</button>
+
         <Switch>
-          <Route path="/dash">
-            <p>You're at dash</p>
+          <Route path="/login">
+            <LoginView
+              status={loginStatus}
+              submitLogin={submitLogin}
+            />
           </Route>
           <Route path="/pics">
             <p>You're at pics!</p>
+          </Route>
+          <Route path="/">
+            <Redirect exact from="/" to="login" />
           </Route>
           <Route path="*">
             <p>404</p>
