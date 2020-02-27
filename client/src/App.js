@@ -3,6 +3,8 @@ import logo from './logo.svg';
 import axios from 'axios';
 import './App.css';
 
+import Button from '@material-ui/core/Button'
+
 import LoginView from './components/LoginView'
 
 import {
@@ -10,12 +12,9 @@ import {
   Switch,
   Route,
   Redirect,
-  Link
+  Link,
+  useHistory,
 } from 'react-router-dom'
-
-
-
-
 
 const auth = {
   isAuthenticated: false,
@@ -47,11 +46,13 @@ const auth = {
       console.log(e)
     }
   },
-  clearCookie: async () => {
+  clearCookie: async (cb) => {
     try {
       const res = await axios.get('/clear_cookie');
       if (res.status === 200) {
         console.log('Successfully cleared cookie')
+        auth.isAuthenticated = false
+        cb()
       }
     } catch (e) {
       console.log(e);
@@ -70,6 +71,10 @@ function App() {
     const status = auth.authenticate(username, password, cb);
     setLoginStatus(status);
   }
+  const handleLogout = (cb) => {
+    auth.clearCookie(cb);
+    setLoginStatus(false);
+  }
 
   return (
     <Router>
@@ -87,6 +92,9 @@ function App() {
           </Route>
           <PrivateRoute path="/">
             <h1>Welcome!</h1>
+            <LogoutButton
+              logout={handleLogout}
+            />
           </PrivateRoute>
           <Route path="*">
             <p>404</p>
@@ -96,7 +104,6 @@ function App() {
     </Router>
   );
 }
-
 export default App;
 
 function PrivateRoute({ children, ...rest }) {
@@ -117,4 +124,17 @@ function PrivateRoute({ children, ...rest }) {
       }
     />
   );
+}
+
+
+const LogoutButton = (props) => {
+  let history = useHistory()
+
+  const handleLogout = () => {
+    props.logout(() => { history.push("/") })
+  }
+
+  return (
+    <Button onClick={handleLogout}>Logout</Button>
+  )
 }

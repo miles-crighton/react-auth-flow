@@ -46,7 +46,6 @@ const InputView = (props) => {
 
     let history = useHistory();
     let location = useLocation();
-
     let { from } = location.state || { from: { pathname: "/" } };
 
     const handleLogin = (e) => {
@@ -56,6 +55,7 @@ const InputView = (props) => {
             history.replace(from);
         });
     }
+
     return (
         <Container component="main" maxWidth="xs" className={classes.container}>
             <Typography component="h1" variant="h5">
