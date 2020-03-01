@@ -59,7 +59,7 @@ const auth = {
   },
   checkCookie: async () => {
     try {
-      const res = await axios.get('/read_cookie')
+      const res = await axios.get('api/user/read-cookie')
       console.log(res.data)
       if (res.data.screen === 'auth') {
         console.log('need to auth first!')
@@ -74,7 +74,7 @@ const auth = {
   },
   clearCookie: async (cb) => {
     try {
-      const res = await axios.get('/clear_cookie');
+      const res = await axios.get('api/user/clear-cookie');
       if (res.status === 200) {
         console.log('Successfully cleared cookie')
         auth.isAuthenticated = false

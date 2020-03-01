@@ -33,7 +33,26 @@ router.post('/user/login', (req, res) => {
             res.cookie('name', req.body.username, options).send({ screen: req.body.username });
             console.log(`Successful user login: ${req.body.username}`);
         });
+        //Make log of logins over time
     });
+});
+
+router.get('/user/get-data', (req, res) => {
+    if (req.signedCookies.name) {
+        res.send({ user: req.signedCookies.name, data: [1, 2, 3] })
+    }
+});
+
+router.get('/user/read-cookie', (req, res) => {
+    if (req.signedCookies.name) {
+        res.send({ screen: req.signedCookies.name });
+    } else {
+        res.send({ screen: 'auth' });
+    }
+});
+
+router.get('/user/clear-cookie', (req, res) => {
+    res.clearCookie('name').end();
 });
 
 module.exports = router;

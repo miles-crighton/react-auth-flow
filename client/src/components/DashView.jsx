@@ -34,7 +34,7 @@ const DashView = (props) => {
     useEffect(() => {
         const getData = async () => {
             try {
-                const res = await axios.get('/get_user_data');
+                const res = await axios.get('api/user/get-data');
                 console.log(res)
                 if (res.status === 200) {
                     setUserData(res.data.data)
