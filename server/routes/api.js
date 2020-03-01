@@ -30,16 +30,24 @@ router.post('/user/login', (req, res) => {
             if(!isMatch) return res.status(400).send({
                 message: 'Wrong password'
             });
-            res.cookie('name', req.body.username, options).send({ screen: req.body.username });
-            console.log(`Successful user login: ${req.body.username}`);
+            let date = new Date();
+            User.update({ 'username': req.body.username }, { $push: { loginHistory: date } }, (err) => {
+                if(err) throw err
+                res.cookie('name', req.body.username, options).send({ screen: req.body.username });
+                console.log(`Successful user login: ${req.body.username}`);
+            });
         });
-        //Make log of logins over time
     });
 });
 
 router.get('/user/get-data', (req, res) => {
     if (req.signedCookies.name) {
-        res.send({ user: req.signedCookies.name, data: [1, 2, 3] })
+        User.findOne({ 'username': req.signedCookies.name }, (err, user) => {
+            console.log(user)
+            if(!user) return res.status(400).send({ message: 'Unable to get data' });
+            res.send({ user: req.signedCookies.name, data: user.loginHistory })
+        })
+
     }
 });
 
