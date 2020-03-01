@@ -11,6 +11,8 @@ TO BE ADDED
         - React-router
     - Back-end
         - Express
-        - Express-basic-auth
+        - Mongoose
         - Cookie-parser
+    - Cloud
+        mongoDB.Atlas
 
