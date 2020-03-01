@@ -19,12 +19,15 @@ const useStyles = makeStyles(theme => ({
         padding: '20px',
         borderRadius: '10px'
     },
+    tileContainer: {
+        borderRadius: '10px',
+        backgroundColor: 'white',
+        border: '1px solid lightgrey'
+    },
     logout: {
-
+        margin: 10
     }
 }));
-
-
 
 const DashView = (props) => {
     const [userData, setUserData] = useState([]);
@@ -50,9 +53,10 @@ const DashView = (props) => {
     return (
         <Container className={classes.container} maxWidth='sm' component="main">
             <h1>Welcome to your dashboard {user}!</h1>
-            {userData.map((val) => {
+            {/* {userData.map((val) => {
                 return <div key={val}>{val}</div>
-            })}
+            })} */}
+            <LoginHistory dates={userData}/>
             <LogoutButton logout={props.logout} className={classes.logout}/>
         </Container>
     )
@@ -67,6 +71,27 @@ const LogoutButton = (props) => {
     }
 
     return (
-        <Button onClick={handleLogout} color="primary" variant="contained" className={props.className}>Logout</Button>
+        <Button 
+            onClick={handleLogout} 
+            color="primary" 
+            variant="contained" 
+            className={props.className}>Logout</Button>
+    )
+}
+
+const LoginHistory = (props) => {
+    const classes = useStyles();
+    return (
+        <Container className={classes.tileContainer}>
+            <table>
+                <tr>
+                    <th>Login History</th>
+                </tr>
+                {props.dates.map((val) => {
+                    return <tr key={val}><td>{val}</td></tr>
+                })}
+            </table>
+        </Container>
+
     )
 }
