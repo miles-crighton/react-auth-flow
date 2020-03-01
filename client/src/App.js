@@ -27,7 +27,7 @@ const auth = {
   isAuthenticated: false,
   authenticate: async (username, password, cb) => {
     try {
-      const res = await axios.get('/authenticate', { auth: { username, password } });
+      const res = await axios.post('/api/user/login', { username, password });
       console.log(res.data);
       if (res.status === 200) {
         auth.isAuthenticated = true
@@ -43,7 +43,7 @@ const auth = {
   },
   createAccount: async (username, password, cb) => {
     try {
-      const res = await axios.post('/create_account', { username, password });
+      const res = await axios.post('/api/user/signup', { username, password });
       console.log(res.data);
       if (res.status === 200) {
         auth.isAuthenticated = true

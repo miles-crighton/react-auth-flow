@@ -2,14 +2,31 @@ const express = require('express');
 const path = require('path');
 const app = express();
 
+var apiRouter = require('./routes/api');
+
 const basicAuth = require('express-basic-auth');
 const cookieParser = require('cookie-parser');
 
+require('dotenv').config()
+//const envfile = require('envfile');
 
-let users = {
-    admin: '123',
-    user: '456',
-};
+//Import the mongoose module
+var mongoose = require('mongoose');
+
+const dbUser = process.env.MONGODB_USER
+const dbPass = process.env.MONGODB_PASS
+
+console.log(dbUser, dbPass)
+
+//Set up default mongoose connection
+var mongoDB = `mongodb+srv://${dbUser}:${dbPass}@cluster0-nshbm.gcp.mongodb.net/react-auth?retryWrites=true&w=majority`;
+mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
+
+//Get the default connection
+var db = mongoose.connection;
+
+//Bind connection to error event (to get notification of connection errors)
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 
 const PORT = 5000 || process.env.PORT;
@@ -25,20 +42,6 @@ app.use(
 ).listen(
     PORT, () => console.log(`Listening on ${PORT}`)
 );
-
-app.get('/authenticate', basicAuth({ users }), (req, res) => {
-    const options = {
-        httpOnly: true,
-        signed: true
-    }
-    console.log(users)
-
-    if (req.auth.user === 'admin') {
-        res.cookie('name', 'admin', options).send({ screen: 'admin' });
-    } else{
-        res.cookie('name', req.auth.user, options).send({ screen: req.auth.user });
-    }
-});
 
 app.get('/read_cookie', (req, res) => {
     if (req.signedCookies.name) {
@@ -58,17 +61,7 @@ app.get('/get_user_data', (req, res) => {
     }
 });
 
-app.post('/create_account', (req, res) => {
-    const options = {
-        httpOnly: true,
-        signed: true
-    }
-
-    users[req.body.username] = req.body.password
-    res.cookie('name', req.body.username, options).send({ screen: req.body.username })
-    console.log(`Added ${req.body.username} to users`)
-    console.log(users)
-});
+app.use('/api', apiRouter);
 
 app.get('/', (req, res) => {
     //res.sendFile(path.join(__dirname, '../client/build/index.html'));

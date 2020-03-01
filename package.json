@@ -6,7 +6,7 @@
     "concurrently": "^5.1.0"
   },
   "scripts": {
-    "start": "concurrently --kill-others \"cd client && npm run start\" \"nodemon ./server/index.js\"",
+    "start": "concurrently --kill-others \"cd client && npm run start\" \"cd server && nodemon index.js\"",
     "pre-install": "npm i",
     "install-client": "cd client && npm i",
     "install-server": "cd server && npm i",
