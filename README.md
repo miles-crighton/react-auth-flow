@@ -1,7 +1,7 @@
 # React-Auth-Flow
 A project revolved around developing a basic user authentication flow in React.
 
-## How to run:
+## How to run **currently unavailable as mongoDB.Atlas requires auth**:
 
 Run `git clone https://github.com/miles-crighton/react-auth-flow.git` in a local directory
 
